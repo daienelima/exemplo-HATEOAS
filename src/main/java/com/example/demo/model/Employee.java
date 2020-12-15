@@ -7,8 +7,7 @@ import javax.persistence.Id;
 @Entity
 public class Employee {
 	
-	private @Id @GeneratedValue 
-	Long id;
+	private @Id @GeneratedValue Long id;
 	private String name;
 	private String role;
 	
@@ -17,7 +16,7 @@ public class Employee {
 		this.name = name;
 		this.role = role;
 	}
-	//gets and sets
+
 	public Long getId() {
 		return id;
 	}
