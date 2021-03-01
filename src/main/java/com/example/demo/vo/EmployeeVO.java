@@ -1,19 +1,14 @@
-package com.example.demo.model;
+package com.example.demo.vo;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
-@Entity
-public class Employee {
+public class EmployeeVO {
 	
-	private @Id @GeneratedValue Long id;
+	private Long id;
 	private String name;
 	private String role;
 	
-	public Employee() {}
+	public EmployeeVO() {}
 	
-	public Employee(String name, String role) {
+	public EmployeeVO(String name, String role) {
 		this.name = name;
 		this.role = role;
 	}
@@ -36,7 +31,5 @@ public class Employee {
 	public void setRole(String role) {
 		this.role = role;
 	}
-	
-	
 
 }

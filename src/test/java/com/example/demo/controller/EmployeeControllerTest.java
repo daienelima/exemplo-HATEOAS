@@ -13,8 +13,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import com.example.demo.exception.EmployeeNotFoundException;
 import com.example.demo.model.Employee;
@@ -43,9 +46,9 @@ public class EmployeeControllerTest {
 	@Test
 	public void one_ok () {
 		when(employeeRepository.findById(anyLong())).thenReturn(Optional.ofNullable(EmployeeTest.create()));
-		EntityModel<Employee> employee = employeeController.one(1L);
-		assertEquals("Bilbo Baggins", employee.getContent().getName());
-		assertEquals("burglar", employee.getContent().getRole());
+		ResponseEntity<EntityModel<Employee>> employee = employeeController.one(1L);
+		assertEquals("Bilbo Baggins", employee.getBody().getContent().getName());
+		assertEquals("burglar", employee.getBody().getContent().getRole());
 	}
 	
 	@Test(expected = EmployeeNotFoundException.class)
@@ -57,23 +60,31 @@ public class EmployeeControllerTest {
 	public void newEmployee_test() {
 		Employee employee = EmployeeTest.create();
 		when(employeeRepository.save(employee)).thenReturn(employee);
-		Employee newEmployee = employeeController.newEmployee(employee);
-		assertEquals(employee.getName(), newEmployee.getName());
-		assertEquals(employee.getRole(), newEmployee.getRole());
+		ResponseEntity<Employee> newEmployee = employeeController.newEmployee(employee);
+		assertEquals(employee.getName(), newEmployee.getBody().getName());
+		assertEquals(employee.getRole(), newEmployee.getBody().getRole());
 	}
 	
 	@Test
 	public void replaceEmployee() {
 		Employee employee = EmployeeTest.create();
+		when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 		when(employeeRepository.save(employee)).thenReturn(employee);
 		employee.setName("altName");
-		Employee employeereplace = employeeController.replaceEmployee(employee, 1L);
-		assertEquals("altName", employeereplace.getName());
+		ResponseEntity<Employee> employeereplace = employeeController.replaceEmployee(employee, 1L);
+		assertEquals("altName", employeereplace.getBody().getName());
+	}
+	
+	@Test()
+	public void replaceEmployeeNotFound() {
+		Employee employee = new Employee();
+		assertEquals(HttpStatus.NO_CONTENT, employeeController.replaceEmployee(employee, 5L).getStatusCode());
 	}
 	
 	@Test
 	public void deleteEmployee() {
 		employeeController.deleteEmployee(1L);
+		Mockito.verify(employeeRepository, Mockito.times(1)).deleteById(1L);
 	}
 	
 	private List<Employee> createEmployeeMock() {
